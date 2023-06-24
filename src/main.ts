@@ -6,7 +6,7 @@ import { SwaggerModule } from '@nestjs/swagger/dist';
 import * as express from 'express';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 
-const { domain, port } = process.env;
+const { DOMAIN, PORT } = process.env;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,8 +23,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
-  await app.listen(port, () => {
-    console.log(`Server is starting at ${domain}:${port}...`);
+  await app.listen(PORT, () => {
+    console.log(`Server is starting at ${DOMAIN}:${PORT}...`);
   });
 }
 bootstrap();

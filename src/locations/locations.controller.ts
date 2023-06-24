@@ -24,10 +24,6 @@ import {
 } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import * as path from 'path';
-import * as sharp from 'sharp';
-import * as fs from 'fs';
 import { LocationUpdateDTO, LocationDTO } from './dto';
 import { CompressImagePipe } from 'src/pipes/compress-image.pipe';
 
@@ -83,7 +79,7 @@ export class LocationsController {
     try {
       const location = await this.locationsService.create({
         ...data,
-        photo: photo?.filename || null,
+        photo: data?.photo !== null ? photo && photo?.filename : null,
       });
       return { message: 'Successfully created!', data: location };
     } catch (err) {
@@ -104,7 +100,7 @@ export class LocationsController {
     try {
       const updatedLocation = await this.locationsService.update(+id, {
         ...data,
-        photo: data.photo !== null ? photo?.filename : null,
+        photo: data?.photo !== null ? photo && photo?.filename : null,
       });
       return { message: 'Successfully updated!', data: updatedLocation };
     } catch (err) {

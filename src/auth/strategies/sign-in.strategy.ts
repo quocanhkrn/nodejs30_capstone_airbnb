@@ -7,12 +7,14 @@ import {
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config/dist';
 
 @Injectable()
 export class SignInStrategy extends PassportStrategy(Strategy, 'sign-in') {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {
     super({ usernameField: 'email' });
   }
@@ -23,7 +25,10 @@ export class SignInStrategy extends PassportStrategy(Strategy, 'sign-in') {
       if (!user) {
         throw new UnauthorizedException();
       } else {
-        const data = this.jwtService.sign({ data: user });
+        const data = this.jwtService.sign(
+          { data: user },
+          { secret: this.configService.get('SECRET_KEY') },
+        );
         return { message: 'Successfully signed in!', access_token: data };
       }
     } catch (err) {

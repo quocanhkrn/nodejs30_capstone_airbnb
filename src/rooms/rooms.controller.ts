@@ -23,8 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as sharp from 'sharp';
-import * as fs from 'fs';
 import { RoomDTO, RoomUpdateDTO } from './dto';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import { Room } from './entities';
@@ -64,13 +62,13 @@ export class RoomsController {
         );
       }
 
-      if (data?.length > 0 || data) {
+      if (data?.length === 0 || !data) {
+        throw new NotFoundException();
+      } else {
         return {
           message: 'Successfully!',
           data: instanceToPlain(plainToClass(Room, data)),
         };
-      } else {
-        throw new NotFoundException();
       }
     } catch (err) {
       throw err || new InternalServerErrorException();
@@ -90,9 +88,12 @@ export class RoomsController {
     try {
       const room: RoomDTO = await this.roomsService.create({
         ...data,
-        photo: photo?.filename,
+        photo: data?.photo !== null ? photo && photo?.filename : null,
       });
-      return { message: 'Successfully created!', data: room };
+      return {
+        message: 'Successfully created!',
+        data: instanceToPlain(plainToClass(Room, room)),
+      };
     } catch (err) {
       throw err || new InternalServerErrorException();
     }
@@ -112,9 +113,12 @@ export class RoomsController {
     try {
       const room = await this.roomsService.update(+id, {
         ...data,
-        photo: photo?.filename,
+        photo: data?.photo !== null ? photo && photo?.filename : null,
       });
-      return { message: 'Successfully created!', data: room };
+      return {
+        message: 'Successfully created!',
+        data: instanceToPlain(plainToClass(Room, room)),
+      };
     } catch (err) {
       throw err || new InternalServerErrorException();
     }

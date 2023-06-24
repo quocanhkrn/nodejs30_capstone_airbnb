@@ -18,5 +18,5 @@ export class User {
 
   gender: 'Male' | 'Female' | 'Undefined';
 
-  role: 'Guest' | 'Admin';
+  role?: 'Guest' | 'Admin';
 }

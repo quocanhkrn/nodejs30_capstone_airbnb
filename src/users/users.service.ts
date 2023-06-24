@@ -7,7 +7,6 @@ import { PrismaClient } from '@prisma/client';
 import { User } from './entities';
 import { UserUpdateDTO, UserDTO } from './dto';
 import * as bcrypt from 'bcrypt';
-import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -35,7 +34,7 @@ export class UsersService {
     return user;
   }
 
-  async checkExistence({ email, phone }): Promise<UserDTO> {
+  async checkExistence({ email, phone }: User): Promise<UserDTO> {
     const user: UserDTO = await this.prisma.users.findFirst({
       where: {
         OR: [{ email }, { phone }],

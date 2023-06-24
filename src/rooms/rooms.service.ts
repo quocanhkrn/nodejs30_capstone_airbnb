@@ -49,7 +49,10 @@ export class RoomsService {
   }
 
   async create(data: RoomDTO): Promise<RoomDTO> {
-    const room: RoomDTO = await this.prisma.rooms.create({ data });
+    const room: RoomDTO = await this.prisma.rooms.create({
+      data,
+      include: { location: true },
+    });
     return room;
   }
 
@@ -57,6 +60,7 @@ export class RoomsService {
     const room: RoomDTO = await this.prisma.rooms.update({
       where: { id },
       data,
+      include: { location: true },
     });
     return room;
   }

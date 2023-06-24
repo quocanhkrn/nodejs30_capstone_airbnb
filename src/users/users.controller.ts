@@ -12,6 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -25,10 +26,9 @@ import { UserDTO, UserUpdateDTO } from './dto';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { User } from './entities';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as sharp from 'sharp';
-import * as fs from 'fs';
 import { plainToClass, instanceToPlain } from 'class-transformer';
 import { CompressImagePipe } from 'src/pipes/compress-image.pipe';
+import { CheckExistencePipe } from 'src/pipes/check-existence.pipe';
 
 @UseGuards(LocalAuthGuard)
 @ApiTags('Users')
@@ -56,16 +56,14 @@ export class UsersController {
       } else
         data = await this.usersService.findAll(searchKeyword, +records, +page);
 
-      if (data?.length > 0 || data) {
-        const role = 'guest';
-        data = await data.map((user: UserDTO) =>
-          instanceToPlain(plainToClass(User, user, { groups: [role] }), {
-            groups: [role],
-          }),
-        );
-        return { message: 'Successfully!', data };
-      } else {
+      if (data?.length === 0 || !data) {
         throw new NotFoundException();
+      } else {
+        const role = 'guest';
+        data = instanceToPlain(plainToClass(User, data, { groups: [role] }), {
+          groups: [role],
+        });
+        return { message: 'Successfully!', data };
       }
     } catch (err) {
       throw err || new InternalServerErrorException();
@@ -79,13 +77,13 @@ export class UsersController {
   @Post('new')
   @UseInterceptors(FileInterceptor('avatar'))
   async create(
-    @Body() data: UserDTO,
+    @Body(CheckExistencePipe) data: UserDTO,
     @UploadedFile(CompressImagePipe) avatar: Express.Multer.File,
   ) {
     try {
       const user = await this.usersService.create({
         ...data,
-        avatar: avatar?.filename || null,
+        avatar: data?.avatar !== null ? avatar && avatar?.filename : null,
       });
 
       return {
@@ -108,15 +106,22 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('avatar'))
   async update(
     @Param('id') id: string,
-    @Body() data: UserUpdateDTO,
+    @Body(CheckExistencePipe) data: UserUpdateDTO,
     @UploadedFile(CompressImagePipe) avatar: Express.Multer.File,
   ) {
     try {
       const updatedUser: UserDTO = await this.usersService.update(+id, {
         ...data,
-        avatar: data.avatar !== null ? avatar?.filename : null,
+        avatar: data?.avatar !== null ? avatar && avatar?.filename : null,
       });
-      return { message: 'Successfully updated!', data: updatedUser };
+
+      return {
+        message: 'Successfully updated!',
+        data: instanceToPlain(
+          plainToClass(User, updatedUser, { groups: ['Guest'] }),
+          { groups: ['Guest'] },
+        ),
+      };
     } catch (err) {
       throw err || new InternalServerErrorException();
     }

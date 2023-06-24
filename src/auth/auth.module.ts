@@ -8,11 +8,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.register({ secret: process.env.SECRET_KEY }),
-    UsersModule,
-  ],
+  imports: [PassportModule, JwtModule.register({}), UsersModule],
   controllers: [AuthController],
   providers: [AuthService, SignInStrategy, LocalStrategy],
 })

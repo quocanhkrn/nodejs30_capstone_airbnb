@@ -7,9 +7,18 @@ import { LocationsModule } from './locations/locations.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { ReservationsModule } from './reservations/reservations.module';
 import { CommentsModule } from './comments/comments.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [AuthModule, UsersModule, LocationsModule, RoomsModule, ReservationsModule, CommentsModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
+    UsersModule,
+    LocationsModule,
+    RoomsModule,
+    ReservationsModule,
+    CommentsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

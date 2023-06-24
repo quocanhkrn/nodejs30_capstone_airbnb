@@ -7,12 +7,10 @@ export class CompressImagePipe implements PipeTransform {
   async transform(image: Express.Multer.File, metadata: ArgumentMetadata) {
     if (image) {
       const compressImage = await sharp(image.path)
-        .jpeg({ quality: 20 })
+        .webp({ quality: 10 })
         .toBuffer();
       fs.writeFileSync(image.path, compressImage);
     }
     return image;
   }
 }
-
-export class asas {}

@@ -18,9 +18,9 @@ import { ReservationDTO, ReservationUpdateDTO } from './dto';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import { Reservation } from './entities';
 
-// @UseGuards(LocalAuthGuard)
+@UseGuards(LocalAuthGuard)
 @ApiTags('Reservations')
-// @ApiHeader({ name: 'access_token', required: true })
+@ApiHeader({ name: 'access_token', required: true })
 @Controller('reservations')
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
