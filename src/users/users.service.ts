@@ -18,10 +18,24 @@ export class UsersService {
     page: number,
   ): Promise<UserDTO[]> {
     const data: UserDTO[] = await this.prisma.users.findMany({
-      where: searchKeyword && {
-        name: {
-          contains: searchKeyword,
-        },
+      where: searchKeyword?.trim() && {
+        OR: [
+          {
+            name: {
+              contains: searchKeyword,
+            },
+          },
+          {
+            email: {
+              contains: searchKeyword,
+            },
+          },
+          {
+            phone: {
+              contains: searchKeyword,
+            },
+          },
+        ],
       },
       skip: records * (page - 1) || undefined,
       take: records || undefined,

@@ -13,11 +13,13 @@ export class LocationsService {
   ): Promise<LocationDTO[]> {
     const data: LocationDTO[] = await this.prisma.locations.findMany({
       where: {
-        OR: searchKeyword && [
-          { address: { contains: searchKeyword } },
-          { city: { contains: searchKeyword } },
-          { country: { contains: searchKeyword } },
-        ],
+        OR: searchKeyword?.trim()
+          ? [
+              { address: { contains: searchKeyword || undefined } },
+              { city: { contains: searchKeyword || undefined } },
+              { country: { contains: searchKeyword || undefined } },
+            ]
+          : undefined,
       },
       skip: records * (page - 1) || undefined,
       take: records || undefined,

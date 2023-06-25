@@ -14,17 +14,19 @@ export class ReservationsService {
   ): Promise<ReservationDTO[]> {
     const data: ReservationDTO[] = await this.prisma.reservations.findMany({
       where: {
-        OR: searchKeyword && [
-          {
-            reserved_by: {
-              OR: [
-                { name: { contains: searchKeyword } },
-                { email: { contains: searchKeyword } },
-                { phone: { contains: searchKeyword } },
-              ],
-            },
-          },
-        ],
+        OR: searchKeyword?.trim()
+          ? [
+              {
+                reserved_by: {
+                  OR: [
+                    { name: { contains: searchKeyword } },
+                    { email: { contains: searchKeyword } },
+                    { phone: { contains: searchKeyword } },
+                  ],
+                },
+              },
+            ]
+          : undefined,
         reserved_by_id: userID || undefined,
       },
       include: { reserved_by: true },

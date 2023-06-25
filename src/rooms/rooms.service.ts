@@ -14,18 +14,20 @@ export class RoomsService {
   ): Promise<RoomDTO[]> {
     const data: RoomDTO[] = await this.prisma.rooms.findMany({
       where: {
-        OR: searchKeyword && [
-          { name: { contains: searchKeyword } },
-          {
-            location: {
-              OR: [
-                { address: { contains: searchKeyword } },
-                { city: { contains: searchKeyword } },
-                { country: { contains: searchKeyword } },
-              ],
-            },
-          },
-        ],
+        OR: searchKeyword?.trim()
+          ? [
+              { name: { contains: searchKeyword } },
+              {
+                location: {
+                  OR: [
+                    { address: { contains: searchKeyword } },
+                    { city: { contains: searchKeyword } },
+                    { country: { contains: searchKeyword } },
+                  ],
+                },
+              },
+            ]
+          : undefined,
         location_id: location_id || undefined,
       },
       include: { location: true },
