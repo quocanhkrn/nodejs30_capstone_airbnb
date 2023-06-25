@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN yarn install --network-timeout 1000000
+RUN yarn install
 
 COPY . .
 
